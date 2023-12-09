@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity =0.8.19;
-import {console2} from "forge-std/Test.sol";
+
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
     function transfer(address to, uint256 amount) external returns (bool);
@@ -30,7 +30,7 @@ error NotProfitable(uint256);
 //////////////////////////////////////////////////////////
 contract dApp {
 
-    address constant HLP_PORTAL = 0x24b7d3034C711497c81ed5f70BEE2280907Ea1Fa;
+    address constant HLP_PORTAL_ADDRESS = 0x24b7d3034C711497c81ed5f70BEE2280907Ea1Fa;
     address constant USDCE = 0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8;
     address constant ARB = 0x912CE59144191C1204E64559FE8253a0e49E6548;
     address constant PSM = 0x17A8541B82BF67e10B0874284b4Ae66858cb1fd5;
@@ -44,7 +44,7 @@ contract dApp {
     uint256 constant ARB_DECIMALS = 10**18;
     uint256 constant PRICE_FEED_DECIMALS = 10**8;
 
-    portal constant HLP_PORT = portal(HLP_PORTAL);
+    portal constant HLP_PORTAL = portal(HLP_PORTAL_ADDRESS);
     AggregatorV3Interface constant ARB_DATA_FEED = AggregatorV3Interface(0xb2A824043730FE05F3DA2efaFa1CBbe83fa548D6); //8 Decimals
 
     uint128 public fee;
@@ -63,10 +63,10 @@ contract dApp {
         (uint256 profit, uint256 total) = checkUSDCE(_price);
         if(_expectedprofit < minProfit){revert ExpectedProfitToLow(minProfit);}
         if(profit < _expectedprofit*USDCE_DECIMALS){revert NotProfitable(profit/USDCE_DECIMALS);}
-        HLP_PORT.claimRewardsHLPandHMX();
+        HLP_PORTAL.claimRewardsHLPandHMX();
         IERC20(PSM).transferFrom(msg.sender, address(this), AMOUNT);
-        IERC20(PSM).approve(HLP_PORTAL, AMOUNT);
-        HLP_PORT.convert(USDCE, total, block.timestamp);
+        IERC20(PSM).approve(HLP_PORTAL_ADDRESS, AMOUNT);
+        HLP_PORTAL.convert(USDCE, total, block.timestamp);
         if (msg.sender != owner){
             uint256 protocolFee = profit * fee / ONE;
             IERC20(USDCE).transfer(owner, protocolFee);
@@ -76,8 +76,8 @@ contract dApp {
     // @_price = Worth of 100K PSM in dollar
     function checkUSDCE(uint256 _price) public view returns(uint256 profit, uint256 total){
         uint256 psmWorth = _price*USDCE_DECIMALS;
-        uint256 balance = IERC20(USDCE).balanceOf(HLP_PORTAL);
-        uint256 pending = HLP_PORT.getPendingRewards(USDCE_REWARDER);
+        uint256 balance = IERC20(USDCE).balanceOf(HLP_PORTAL_ADDRESS);
+        uint256 pending = HLP_PORTAL.getPendingRewards(USDCE_REWARDER);
         total = balance + pending;
         if(total < psmWorth){revert FinancialLoss(total/USDCE_DECIMALS);}
         profit = total - psmWorth; 
@@ -93,10 +93,10 @@ contract dApp {
         address[][] memory rewarders = new address[][](1);
         rewarders[0] = new address[](1);
         rewarders[0][0] = ARB_REWARDER;
-        HLP_PORT.claimRewardsManual(pools, rewarders);
+        HLP_PORTAL.claimRewardsManual(pools, rewarders);
         IERC20(PSM).transferFrom(msg.sender, address(this), AMOUNT);
-        IERC20(PSM).approve(HLP_PORTAL, AMOUNT);
-        HLP_PORT.convert(ARB, total, block.timestamp);
+        IERC20(PSM).approve(HLP_PORTAL_ADDRESS, AMOUNT);
+        HLP_PORTAL.convert(ARB, total, block.timestamp);
         if (msg.sender != owner){
             uint256 protocolFee = profit * fee / ONE;
             IERC20(ARB).transfer(owner, protocolFee);
@@ -106,15 +106,11 @@ contract dApp {
     // @_price = Worth of 100K PSM in dollar
     function checkARB(uint256 _price) public view returns(uint256 profit, uint256 total){
         uint256 psmWorth = _price*ARB_DECIMALS;
-        console2.log(psmWorth);
-        uint256 balance = IERC20(ARB).balanceOf(HLP_PORTAL);
-        uint256 pending = HLP_PORT.getPendingRewards(ARB_REWARDER);
+        uint256 balance = IERC20(ARB).balanceOf(HLP_PORTAL_ADDRESS);
+        uint256 pending = HLP_PORTAL.getPendingRewards(ARB_REWARDER);
         total = balance + pending;
-        console2.log(total);
         uint256 ARBprice = getARBPrice();
-        console2.log(ARBprice);
         uint256 worth = ARBprice * total / PRICE_FEED_DECIMALS; //(8 decimals + 18 decimals) - (8 decimal) = 18 decimals 
-        console2.log(worth);
         if(worth < psmWorth){revert FinancialLoss(worth/ARB_DECIMALS);}
         profit = worth - psmWorth; 
     }   

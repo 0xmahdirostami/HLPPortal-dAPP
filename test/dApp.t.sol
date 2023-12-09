@@ -41,12 +41,102 @@ contract DappTest is Test {
         console2.log(IERC20(PSM).balanceOf(address(dapp)));
         console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
     }
+    function test_USDC1() public {
+        console2.log(IERC20(PSM).balanceOf(address(alice)));
+        console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
+        vm.startPrank(alice);
+        IERC20(PSM).approve(address(dapp), 100_000e18);
+        dapp.convertUSDCE(50,1);
+        console2.log("````````````````````````````````````````````");
+        console2.log(IERC20(USDCE).balanceOf(address(this)));
+        console2.log(IERC20(USDCE).balanceOf(address(alice)));
+        console2.log(IERC20(USDCE).balanceOf(address(dapp)));
+        console2.log(IERC20(USDCE).balanceOf(address(PORTAL)));
+        console2.log(IERC20(PSM).balanceOf(address(alice)));
+        console2.log(IERC20(PSM).balanceOf(address(dapp)));
+        console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
+    }
+    function test_USDC2() public {
+        console2.log(IERC20(PSM).balanceOf(address(alice)));
+        console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
+        vm.startPrank(alice);
+        IERC20(PSM).approve(address(dapp), 100_000e18);
+        dapp.convertUSDCE(80,80);
+        console2.log("````````````````````````````````````````````");
+        console2.log(IERC20(USDCE).balanceOf(address(this)));
+        console2.log(IERC20(USDCE).balanceOf(address(alice)));
+        console2.log(IERC20(USDCE).balanceOf(address(dapp)));
+        console2.log(IERC20(USDCE).balanceOf(address(PORTAL)));
+        console2.log(IERC20(PSM).balanceOf(address(alice)));
+        console2.log(IERC20(PSM).balanceOf(address(dapp)));
+        console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
+    }
+    function test_USDC3() public {
+        console2.log(IERC20(PSM).balanceOf(address(alice)));
+        console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
+        vm.startPrank(alice);
+        IERC20(PSM).approve(address(dapp), 100_000e18);
+        dapp.convertUSDCE(150,2);
+        console2.log("````````````````````````````````````````````");
+        console2.log(IERC20(USDCE).balanceOf(address(this)));
+        console2.log(IERC20(USDCE).balanceOf(address(alice)));
+        console2.log(IERC20(USDCE).balanceOf(address(dapp)));
+        console2.log(IERC20(USDCE).balanceOf(address(PORTAL)));
+        console2.log(IERC20(PSM).balanceOf(address(alice)));
+        console2.log(IERC20(PSM).balanceOf(address(dapp)));
+        console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
+    }
     function test_ARB() public {
         console2.log(IERC20(PSM).balanceOf(address(alice)));
         console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
         vm.startPrank(alice);
         IERC20(PSM).approve(address(dapp), 100_000e18);
         dapp.convertARB(109, 3);
+        console2.log("````````````````````````````````````````````");
+        console2.log(IERC20(ARB).balanceOf(address(this)));
+        console2.log(IERC20(ARB).balanceOf(address(alice)));
+        console2.log(IERC20(ARB).balanceOf(address(dapp)));
+        console2.log(IERC20(ARB).balanceOf(address(PORTAL)));
+        console2.log(IERC20(PSM).balanceOf(address(alice)));
+        console2.log(IERC20(PSM).balanceOf(address(dapp)));
+        console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
+    }
+    function test_ARB1() public {
+        console2.log(IERC20(PSM).balanceOf(address(alice)));
+        console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
+        vm.startPrank(alice);
+        IERC20(PSM).approve(address(dapp), 100_000e18);
+        dapp.convertARB(50, 1);
+        console2.log("````````````````````````````````````````````");
+        console2.log(IERC20(ARB).balanceOf(address(this)));
+        console2.log(IERC20(ARB).balanceOf(address(alice)));
+        console2.log(IERC20(ARB).balanceOf(address(dapp)));
+        console2.log(IERC20(ARB).balanceOf(address(PORTAL)));
+        console2.log(IERC20(PSM).balanceOf(address(alice)));
+        console2.log(IERC20(PSM).balanceOf(address(dapp)));
+        console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
+    }
+    function test_ARB2() public {
+        console2.log(IERC20(PSM).balanceOf(address(alice)));
+        console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
+        vm.startPrank(alice);
+        IERC20(PSM).approve(address(dapp), 100_000e18);
+        dapp.convertARB(50, 50);
+        console2.log("````````````````````````````````````````````");
+        console2.log(IERC20(ARB).balanceOf(address(this)));
+        console2.log(IERC20(ARB).balanceOf(address(alice)));
+        console2.log(IERC20(ARB).balanceOf(address(dapp)));
+        console2.log(IERC20(ARB).balanceOf(address(PORTAL)));
+        console2.log(IERC20(PSM).balanceOf(address(alice)));
+        console2.log(IERC20(PSM).balanceOf(address(dapp)));
+        console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
+    }
+    function test_ARB3() public {
+        console2.log(IERC20(PSM).balanceOf(address(alice)));
+        console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
+        vm.startPrank(alice);
+        IERC20(PSM).approve(address(dapp), 100_000e18);
+        dapp.convertARB(150, 2);
         console2.log("````````````````````````````````````````````");
         console2.log(IERC20(ARB).balanceOf(address(this)));
         console2.log(IERC20(ARB).balanceOf(address(alice)));
