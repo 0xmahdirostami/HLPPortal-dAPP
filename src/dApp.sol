@@ -118,12 +118,12 @@ contract dApp {
         uint256 balance = IERC20(ARB).balanceOf(HLP_PORTAL_ADDRESS);
         uint256 pending = HLP_PORTAL.getPendingRewards(ARB_REWARDER);
         total = balance + pending;
-        uint256 ARBprice = getARBPrice();
+        uint256 ARBprice = getARBPriceChainLink();
         uint256 worth = ARBprice * total / PRICE_FEED_DECIMALS; //(8 decimals + 18 decimals) - (8 decimal) = 18 decimals 
         if(worth < psmWorth){revert FinancialLoss(worth/ARB_DECIMALS);}
         profit = worth - psmWorth; 
     }   
-    function getARBPrice() public view returns(uint256){
+    function getARBPriceChainLink() public view returns(uint256){
         (,int answer,,,) = ARB_DATA_FEED.latestRoundData();
         return uint256(answer);
     }
