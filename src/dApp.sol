@@ -28,6 +28,12 @@ error NotProfitable(uint256);
 //      if you found any issue, please let me know.     //
 //                twitter: 0xmahdirostami               //
 //////////////////////////////////////////////////////////
+
+// todo
+// 1. price oracle for PSM
+// 2. another price orcale for ARB
+// 3. price oracle for USDCe
+
 contract dApp {
 
     address constant HLP_PORTAL_ADDRESS = 0x24b7d3034C711497c81ed5f70BEE2280907Ea1Fa;
