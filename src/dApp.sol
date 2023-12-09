@@ -34,6 +34,7 @@ error NotProfitable(uint256);
 // 1. price oracle for PSM
 // 2. another price orcale for ARB
 // 3. price oracle for USDCe
+// 4. events
 
 contract dApp {
 
@@ -57,6 +58,11 @@ contract dApp {
     uint128 public fee;
     uint128 public minProfit;
     address public owner;
+
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
 
     constructor(){
         owner = msg.sender;
@@ -132,31 +138,23 @@ contract dApp {
 
 
     // owner functions
-    function getTOKEN(address _token) public {
-        onlyOwner();
+    function getTOKEN(address _token) public onlyOwner {
         uint256 balance = IERC20(_token).balanceOf(address(this));
         IERC20(_token).transfer(owner, balance);
     }
-    function getETH() public {
-        onlyOwner();
+    function getETH() public onlyOwner {
         payable(owner).call{value: address(this).balance};
     }
-    function changeFee(uint128 _fee) public {
-        onlyOwner();
+    function changeFee(uint128 _fee) public onlyOwner {
         require(_fee < ONE/2);
         fee = _fee;
     }
-    function changeMinProfit(uint128 _minProfit) public {
-        onlyOwner();
+    function changeMinProfit(uint128 _minProfit) public onlyOwner {
         require(_minProfit >= 1);
         minProfit = _minProfit;
     }    
-    function changeOwner(address _owner) public {
-        onlyOwner();
+    function changeOwner(address _owner) public onlyOwner {
         owner = _owner;
-    }
-    function onlyOwner() internal view {
-        require(msg.sender == owner);
     }
     receive() external payable {} 
 }
