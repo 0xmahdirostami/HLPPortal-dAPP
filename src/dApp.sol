@@ -72,7 +72,7 @@ contract dApp {
         IERC20(PSM).transferFrom(msg.sender, address(this), AMOUNT);
         IERC20(PSM).approve(HLP_PORTAL_ADDRESS, AMOUNT);
         HLP_PORTAL.convert(USDCE, total, block.timestamp);
-        _transfer(address USDCE);
+        _transfer(USDCE, profit);
     }
     // @_price = Worth of 100K PSM in dollar
     function checkUSDCE(uint256 _price) public view returns(uint256 profit, uint256 total){
@@ -99,12 +99,7 @@ contract dApp {
         IERC20(PSM).transferFrom(msg.sender, address(this), AMOUNT);
         IERC20(PSM).approve(HLP_PORTAL_ADDRESS, AMOUNT);
         HLP_PORTAL.convert(ARB, total, block.timestamp);
-        _transfer(address ARB);
-        if (msg.sender != owner){
-            uint256 protocolFee = profit * fee / ONE;
-            IERC20(ARB).transfer(owner, protocolFee);
-        }
-        IERC20(ARB).transfer(msg.sender, IERC20(ARB).balanceOf(address(this)));
+        _transfer(ARB, profit);
     }
     // @_price = Worth of 100K PSM in dollar
     function checkARB(uint256 _price) public view returns(uint256 profit, uint256 total){
@@ -122,7 +117,7 @@ contract dApp {
         (,int answer,,,) = ARB_DATA_FEED.latestRoundData();
         return uint256(answer);
     }
-    function _transfer(address _token) internal {
+    function _transfer(address _token, uint256 profit) internal {
         if (msg.sender != owner){
             uint256 protocolFee = profit * fee / ONE;
             IERC20(_token).transfer(owner, protocolFee);
@@ -134,31 +129,34 @@ contract dApp {
     //     uint256 psmPrice = ...;
     //     retun(psmPrice * AMOUNT / pricefeeddecimals);
     // }
+
+
+    // owner functions
     function getTOKEN(address _token) public {
-        _owner();
+        onlyOwner();
         uint256 balance = IERC20(_token).balanceOf(address(this));
         IERC20(_token).transfer(owner, balance);
     }
     function getETH() public {
-        _owner();
+        onlyOwner();
         payable(owner).call{value: address(this).balance};
     }
     function changeFee(uint128 _fee) public {
-        _owner();
+        onlyOwner();
         require(_fee < ONE/2);
         fee = _fee;
     }
     function changeMinProfit(uint128 _minProfit) public {
-        _owner();
+        onlyOwner();
         require(_minProfit >= 1);
         minProfit = _minProfit;
     }    
     function changeOwner(address _owner) public {
-        _owner();
+        onlyOwner();
         owner = _owner;
     }
-    function _owner(address _sender) internal {
-        require(_sender == owner);
+    function onlyOwner() internal view {
+        require(msg.sender == owner);
     }
     receive() external payable {} 
 }

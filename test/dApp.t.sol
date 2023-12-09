@@ -23,11 +23,17 @@ contract DappTest is Test {
         deal(PSM, alice, 200_000e18);
         deal(PSM, address(this), 200_000e18);
     }
+
     function test_getPrice() public {
         (uint256 profitARB,) = dapp.checkARB(0);
         console2.log("ARB: $", profitARB/10**18);
         (uint256 profitUSDCE,) = dapp.checkUSDCE(0);
         console2.log("USDCE: $", profitUSDCE/10**6);   
+    }
+    function testrevert_owner() public {
+        vm.startPrank(alice);
+        vm.expectRevert();
+        dapp.changeOwner(alice);
     }
     // function test_USDC() public {
     //     vm.startPrank(alice);
