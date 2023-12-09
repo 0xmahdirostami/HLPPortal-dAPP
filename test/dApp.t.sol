@@ -31,7 +31,7 @@ contract DappTest is Test {
         console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
         vm.startPrank(alice);
         IERC20(PSM).approve(address(dapp), 100_000e18);
-        dapp.convertUSDCE(100, 1);
+        dapp.convertUSDCE(109,3);
         console2.log("````````````````````````````````````````````");
         console2.log(IERC20(USDCE).balanceOf(address(this)));
         console2.log(IERC20(USDCE).balanceOf(address(alice)));
@@ -46,7 +46,7 @@ contract DappTest is Test {
         console2.log(IERC20(PSM).balanceOf(address(PORTAL)));
         vm.startPrank(alice);
         IERC20(PSM).approve(address(dapp), 100_000e18);
-        dapp.convertARB(50, 1);
+        dapp.convertARB(109, 3);
         console2.log("````````````````````````````````````````````");
         console2.log(IERC20(ARB).balanceOf(address(this)));
         console2.log(IERC20(ARB).balanceOf(address(alice)));
