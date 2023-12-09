@@ -133,6 +133,11 @@ contract dApp {
         (,int answer,,,) = ARB_DATA_FEED.latestRoundData();
         return uint256(answer);
     }
+    // todo remove _price and fetch PSM price
+    // function psmWorth() public view returns(uint265){
+    //     uint256 psmPrice = ...;
+    //     retun(psmPrice * AMOUNT / pricefeeddecimals);
+    // }
     function _transfer(address _token, uint256 profit) internal {
         if (msg.sender != owner){
             uint256 protocolFee = profit * fee / ONE;
@@ -140,11 +145,6 @@ contract dApp {
         }
         IERC20(_token).transfer(msg.sender, IERC20(_token).balanceOf(address(this)));
     }
-    // todo remove _price and fetch PSM price
-    // function psmWorth() public view returns(uint265){
-    //     uint256 psmPrice = ...;
-    //     retun(psmPrice * AMOUNT / pricefeeddecimals);
-    // }
 
     // owner functions
     function getTOKEN(address _token) public onlyOwner {
