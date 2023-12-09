@@ -60,8 +60,8 @@ contract dApp {
     // @_price = Worth of 100K PSM in dollar
     // @_expectedprofit = expected profit in dollar
     function convertUSDCE(uint256 _price, uint256 _expectedprofit) public {
-        (uint256 profit, uint256 total) = checkUSDCE(_price);
         if(_expectedprofit < minProfit){revert ExpectedProfitToLow(minProfit);}
+        (uint256 profit, uint256 total) = checkUSDCE(_price);
         if(profit < _expectedprofit*USDCE_DECIMALS){revert NotProfitable(profit/USDCE_DECIMALS);}
         HLP_PORTAL.claimRewardsHLPandHMX();
         IERC20(PSM).transferFrom(msg.sender, address(this), AMOUNT);
@@ -85,8 +85,8 @@ contract dApp {
     // @_price = Worth of 100K PSM in dollar
     // @_expectedprofit = expected profit in dollar
     function convertARB(uint256 _price, uint256 _expectedprofit) public {
-        (uint256 profit, uint256 total) = checkARB(_price);
         if(_expectedprofit < minProfit){revert ExpectedProfitToLow(minProfit);}
+        (uint256 profit, uint256 total) = checkARB(_price);
         if(profit < _expectedprofit*ARB_DECIMALS){revert NotProfitable(profit/ARB_DECIMALS);}
         address[] memory pools = new address[](1);
         pools[0] = ARB_POOL;
