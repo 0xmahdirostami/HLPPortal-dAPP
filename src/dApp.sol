@@ -35,6 +35,7 @@ error NotProfitable(uint256);
 // 2. another price orcale for ARB
 // 3. price oracle for USDCe
 // 4. events
+// 5. more errors
 
 contract dApp {
 
