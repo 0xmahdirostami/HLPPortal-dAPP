@@ -1,21 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity =0.8.19;
-import {console2} from "forge-std/Test.sol";
-
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
     function transfer(address to, uint256 amount) external returns (bool);
     function approve(address spender, uint256 amount) external returns (bool);
     function transferFrom(address from, address to, uint256 amount) external returns (bool);
 }
-
 interface portal {
     function convert(address _token, uint256 _minReceived, uint256 _deadline) external;
     function getPendingRewards(address _rewarder) external view returns(uint256 claimableReward);
     function claimRewardsHLPandHMX() external;
     function claimRewardsManual(address[] memory _pools, address[][] memory _rewarders) external;
 }
-
 interface AggregatorV3Interface{
     function latestRoundData() external view returns(uint80,int,uint,uint,uint80);
 }
