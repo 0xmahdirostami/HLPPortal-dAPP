@@ -1,20 +1,24 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity =0.8.19;
+
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
     function transfer(address to, uint256 amount) external returns (bool);
     function approve(address spender, uint256 amount) external returns (bool);
     function transferFrom(address from, address to, uint256 amount) external returns (bool);
 }
+
 interface portal {
     function convert(address _token, uint256 _minReceived, uint256 _deadline) external;
     function getPendingRewards(address _rewarder) external view returns(uint256 claimableReward);
     function claimRewardsHLPandHMX() external;
     function claimRewardsManual(address[] memory _pools, address[][] memory _rewarders) external;
 }
+
 interface AggregatorV3Interface{
     function latestRoundData() external view returns(uint80,int,uint,uint,uint80);
 }
+
 contract dApp {
 
     address constant HLPPORTAL = 0x24b7d3034C711497c81ed5f70BEE2280907Ea1Fa;
@@ -29,6 +33,7 @@ contract dApp {
     uint256 constant ONE = 100;
     uint256 constant USDCEDECIMALS = 10**6;
     uint256 constant ARBDECIMALS = 10**18;
+    uint256 constant PRICEFEEDDECIMALS = 10**8;
 
     portal constant HLPport = portal(0x24b7d3034C711497c81ed5f70BEE2280907Ea1Fa);
     AggregatorV3Interface  constant ARBPDATAFEED = AggregatorV3Interface(0xb2A824043730FE05F3DA2efaFa1CBbe83fa548D6); //8 Decimals
@@ -39,7 +44,7 @@ contract dApp {
 
     constructor(){
         owner = msg.sender;
-        fee = 20;
+        fee = 25;
     }
 
     // _price = Worth of 100K PSM in dollar
@@ -85,7 +90,7 @@ contract dApp {
         uint256 pending = HLPport.getPendingRewards(ARBREWARDER);
         total = balance + pending;
         uint256 ARBprice = getARBPrice();
-        uint256 worth = ARBprice * total / 10**8; //(8 decimals + 18 decimals) - (8 decimal) = 18 decimals 
+        uint256 worth = ARBprice * total / PRICEFEEDDECIMALS; //(8 decimals + 18 decimals) - (8 decimal) = 18 decimals 
         require(worth >= psmWorth, "Financial loss");
         profit = worth - psmWorth; 
     }   
