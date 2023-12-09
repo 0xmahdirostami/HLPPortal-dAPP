@@ -35,16 +35,16 @@ contract DappTest is Test {
         vm.expectRevert();
         dapp.changeOwner(alice);
     }
-    // function test_USDC() public {
-    //     vm.startPrank(alice);
-    //     IERC20(PSM).approve(address(dapp), 100_000e18);
-    //     dapp.convertUSDCE(109,3);
-    //     console2.log("````````````````````````````````````````````");
-    //     console2.log(IERC20(USDCE).balanceOf(address(this)));
-    //     console2.log(IERC20(USDCE).balanceOf(address(alice)));
-    //     console2.log(IERC20(USDCE).balanceOf(address(dapp)));
-    //     console2.log(IERC20(USDCE).balanceOf(address(PORTAL)));
-    // }
+    function test_USDC() public {
+        vm.startPrank(alice);
+        IERC20(PSM).approve(address(dapp), 100_000e18);
+        dapp.convertUSDCE(109,3);
+        console2.log("````````````````````````````````````````````");
+        console2.log(IERC20(USDCE).balanceOf(address(this)));
+        console2.log(IERC20(USDCE).balanceOf(address(alice)));
+        console2.log(IERC20(USDCE).balanceOf(address(dapp)));
+        console2.log(IERC20(USDCE).balanceOf(address(PORTAL)));
+    }
     // function test_USDC1() public {
     //     vm.startPrank(alice);
     //     IERC20(PSM).approve(address(dapp), 100_000e18);
