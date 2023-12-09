@@ -54,7 +54,7 @@ contract dApp {
     constructor(){
         owner = msg.sender;
         fee = 25;
-        minProfit = 2;
+        minProfit = 1;
     }
 
     // @_price = Worth of 100K PSM in dollar
@@ -75,6 +75,7 @@ contract dApp {
     }
     // @_price = Worth of 100K PSM in dollar
     function checkUSDCE(uint256 _price) public view returns(uint256 profit, uint256 total){
+        // uint256 psmWorth = psmWorth();
         uint256 psmWorth = _price*USDCE_DECIMALS;
         uint256 balance = IERC20(USDCE).balanceOf(HLP_PORTAL_ADDRESS);
         uint256 pending = HLP_PORTAL.getPendingRewards(USDCE_REWARDER);
@@ -105,6 +106,7 @@ contract dApp {
     }
     // @_price = Worth of 100K PSM in dollar
     function checkARB(uint256 _price) public view returns(uint256 profit, uint256 total){
+        // uint256 psmWorth = psmWorth();
         uint256 psmWorth = _price*ARB_DECIMALS;
         uint256 balance = IERC20(ARB).balanceOf(HLP_PORTAL_ADDRESS);
         uint256 pending = HLP_PORTAL.getPendingRewards(ARB_REWARDER);
@@ -118,6 +120,11 @@ contract dApp {
         (,int answer,,,) = ARB_DATA_FEED.latestRoundData();
         return uint256(answer);
     }
+    // todo
+    // function psmWorth() public view returns(uint265){
+    //     uint256 psmPrice = ...;
+    //     retun(psmPrice * AMOUNT / pricefeeddecimals);
+    // }
     function getTOKEN(address _token) public {
         require(msg.sender == owner);
         uint256 balance = IERC20(_token).balanceOf(address(this));
