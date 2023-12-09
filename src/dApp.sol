@@ -72,9 +72,7 @@ contract dApp {
     // @_price = Worth of 100K PSM in dollar
     // @_expectedprofit = expected profit in dollar
     function convertUSDCE(uint256 _price, uint256 _expectedprofit) public {
-        if(_expectedprofit < minProfit){revert ExpectedProfitToLow(minProfit);}
-        (uint256 profit, uint256 total) = checkUSDCE(_price);
-        if(profit < _expectedprofit*USDCE_DECIMALS){revert NotProfitable(profit/USDCE_DECIMALS);}
+        (uint256 total, uint256 profit) = _checkProfit(USDCE,_price, _expectedprofit);
         HLP_PORTAL.claimRewardsHLPandHMX();
         IERC20(PSM).transferFrom(msg.sender, address(this), AMOUNT);
         IERC20(PSM).approve(HLP_PORTAL_ADDRESS, AMOUNT);
@@ -82,21 +80,9 @@ contract dApp {
         _transfer(USDCE, profit);
     }
     // @_price = Worth of 100K PSM in dollar
-    function checkUSDCE(uint256 _price) public view returns(uint256 profit, uint256 total){
-        // uint256 psmWorth = psmWorth(); todo remove _price and fetch PSM price
-        uint256 psmWorth = _price*USDCE_DECIMALS;
-        uint256 balance = IERC20(USDCE).balanceOf(HLP_PORTAL_ADDRESS);
-        uint256 pending = HLP_PORTAL.getPendingRewards(USDCE_REWARDER);
-        total = balance + pending;
-        if(total < psmWorth){revert FinancialLoss(total/USDCE_DECIMALS);}
-        profit = total - psmWorth; 
-    }
-    // @_price = Worth of 100K PSM in dollar
     // @_expectedprofit = expected profit in dollar
     function convertARB(uint256 _price, uint256 _expectedprofit) public {
-        if(_expectedprofit < minProfit){revert ExpectedProfitToLow(minProfit);}
-        (uint256 profit, uint256 total) = checkARB(_price);
-        if(profit < _expectedprofit*ARB_DECIMALS){revert NotProfitable(profit/ARB_DECIMALS);}
+        (uint256 total, uint256 profit) = _checkProfit(ARB,_price, _expectedprofit);
         address[] memory pools = new address[](1);
         pools[0] = ARB_POOL;
         address[][] memory rewarders = new address[][](1);
@@ -107,6 +93,30 @@ contract dApp {
         IERC20(PSM).approve(HLP_PORTAL_ADDRESS, AMOUNT);
         HLP_PORTAL.convert(ARB, total, block.timestamp);
         _transfer(ARB, profit);
+    }
+    function _checkProfit(address _token, uint256 _price, uint256 _expectedprofit) public view returns(uint256 total, uint256 profit){
+        if (_token == USDCE){
+            if(_expectedprofit < minProfit){revert ExpectedProfitToLow(minProfit);}
+            (profit, total) = checkUSDCE(_price);
+            if(profit < _expectedprofit*USDCE_DECIMALS){revert NotProfitable(profit/USDCE_DECIMALS);}
+        } else if (_token == ARB){
+            if(_expectedprofit < minProfit){revert ExpectedProfitToLow(minProfit);}
+            (profit, total) = checkARB(_price);
+            if(profit < _expectedprofit*ARB_DECIMALS){revert NotProfitable(profit/ARB_DECIMALS);}
+        } else {
+            revert();
+        }
+        return (total, profit);
+    }
+    // @_price = Worth of 100K PSM in dollar
+    function checkUSDCE(uint256 _price) public view returns(uint256 profit, uint256 total){
+        // uint256 psmWorth = psmWorth(); todo remove _price and fetch PSM price
+        uint256 psmWorth = _price*USDCE_DECIMALS;
+        uint256 balance = IERC20(USDCE).balanceOf(HLP_PORTAL_ADDRESS);
+        uint256 pending = HLP_PORTAL.getPendingRewards(USDCE_REWARDER);
+        total = balance + pending;
+        if(total < psmWorth){revert FinancialLoss(total/USDCE_DECIMALS);}
+        profit = total - psmWorth; 
     }
     // @_price = Worth of 100K PSM in dollar
     function checkARB(uint256 _price) public view returns(uint256 profit, uint256 total){
@@ -136,7 +146,6 @@ contract dApp {
     //     uint256 psmPrice = ...;
     //     retun(psmPrice * AMOUNT / pricefeeddecimals);
     // }
-
 
     // owner functions
     function getTOKEN(address _token) public onlyOwner {
