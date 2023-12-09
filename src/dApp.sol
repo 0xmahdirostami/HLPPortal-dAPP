@@ -38,7 +38,7 @@ contract dApp {
     address constant ARB_POOL = 0xbE8f8AF5953869222eA8D39F1Be9d03766010B1C;
     address constant ARB_REWARDER = 0x238DAF7b15342113B00fA9e3F3E60a11Ab4274fD;
 
-    uint256 constant AMOUNT = 100000000000000000000000; // 100k 
+    uint256 constant AMOUNT = 10*23; // 100k = 10**(2+3+18)
     uint256 constant ONE = 100;
     uint256 constant USDCE_DECIMALS = 10**6;
     uint256 constant ARB_DECIMALS = 10**18;
