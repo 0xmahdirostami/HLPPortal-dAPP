@@ -56,8 +56,8 @@ contract dApp {
     portal constant HLP_PORTAL = portal(HLP_PORTAL_ADDRESS);
     AggregatorV3Interface constant ARB_DATA_FEED = AggregatorV3Interface(0xb2A824043730FE05F3DA2efaFa1CBbe83fa548D6); //8 Decimals
 
-    uint128 public fee;
-    uint128 public minProfit;
+    uint48 public fee;
+    uint48 public minProfit;
     address public owner;
 
     modifier onlyOwner() {
@@ -154,11 +154,11 @@ contract dApp {
     function getETH() public onlyOwner {
         payable(owner).call{value: address(this).balance};
     }
-    function changeFee(uint128 _fee) public onlyOwner {
+    function changeFee(uint48 _fee) public onlyOwner {
         require(_fee < ONE/2);
         fee = _fee;
     }
-    function changeMinProfit(uint128 _minProfit) public onlyOwner {
+    function changeMinProfit(uint48 _minProfit) public onlyOwner {
         require(_minProfit >= 1);
         minProfit = _minProfit;
     }    
