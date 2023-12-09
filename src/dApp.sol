@@ -95,12 +95,11 @@ contract dApp {
         _transfer(ARB, profit);
     }
     function _checkProfit(address _token, uint256 _price, uint256 _expectedprofit) public view returns(uint256 total, uint256 profit){
+        if(_expectedprofit < minProfit){revert ExpectedProfitToLow(minProfit);}
         if (_token == USDCE){
-            if(_expectedprofit < minProfit){revert ExpectedProfitToLow(minProfit);}
             (profit, total) = checkUSDCE(_price);
             if(profit < _expectedprofit*USDCE_DECIMALS){revert NotProfitable(profit/USDCE_DECIMALS);}
         } else if (_token == ARB){
-            if(_expectedprofit < minProfit){revert ExpectedProfitToLow(minProfit);}
             (profit, total) = checkARB(_price);
             if(profit < _expectedprofit*ARB_DECIMALS){revert NotProfitable(profit/ARB_DECIMALS);}
         } else {
