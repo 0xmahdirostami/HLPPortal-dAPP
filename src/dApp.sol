@@ -60,8 +60,6 @@ contract dApp {
 
     constructor(){
         owner = msg.sender;
-        fee = 25;
-        minProfit = 1;
     }
 
     // @_price = Worth of 100K PSM in dollar
