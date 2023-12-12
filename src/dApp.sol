@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity =0.8.19;
 
-import {console2} from "forge-std/Test.sol";
+// import {console2} from "forge-std/Test.sol";
 
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
@@ -195,7 +195,6 @@ contract dApp {
         uint256 feeAmount;
         if (sender != owner){
             feeAmount = (balance*_profit*20)/worth/ONE;
-            console2.log(feeAmount);
             _getETH(payable(owner), feeAmount);
         }
         _getETH(payable(sender), balance-feeAmount); 
