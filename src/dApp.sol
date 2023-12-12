@@ -193,7 +193,7 @@ contract dApp {
             // todo convert profit to weth
             IERC20(WETH9).transfer(owner, feeAmount);
         }
-        IERC20(WETH9).transfer(owner, balance-feeAmount); // msg.sender
+        IERC20(WETH9).transfer(owner, balance-feeAmount); // todo msg.sender
     }
 
     // owner functions
