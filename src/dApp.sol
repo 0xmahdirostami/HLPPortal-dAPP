@@ -106,6 +106,7 @@ contract dApp {
         IERC20(PSM).approve(HLP_PORTAL_ADDRESS, AMOUNT);
         HLP_PORTAL.convert(USDCE, total/USDCE_REMAIN_DECIMALS, block.timestamp);
         _swapOut(USDCE);
+        _transfer(profit);
     }
     // @_price = Worth of 100K PSM in dollar
     // @_expectedprofit = expected profit in dollar
@@ -121,6 +122,7 @@ contract dApp {
         IERC20(PSM).approve(HLP_PORTAL_ADDRESS, AMOUNT);
         HLP_PORTAL.convert(ARB, total, block.timestamp);
         _swapOut(ARB);
+        _transfer(profit);
     }
     function _checkProfit(address _token, uint256 _price, uint256 _expectedprofit) public view returns(uint256 total, uint256 profit){
         if(_expectedprofit < minProfit){revert ExpectedProfitToLow(minProfit);}
@@ -166,7 +168,7 @@ contract dApp {
     //     uint256 psmPrice = ...;
     //     retun(psmPrice * AMOUNT / pricefeeddecimals);
     // }
-    function _swapOut(address _token) public returns(uint256 amountOut){
+    function _swapOut(address _token) internal returns(uint256 amountOut){
         uint256 balance = IERC20(_token).balanceOf(address(this));
         IERC20(_token).approve(SWAP_ROUTER, balance);
         ISwapRouter.ExactInputSingleParams memory params =
@@ -174,15 +176,24 @@ contract dApp {
                 tokenIn: _token,
                 tokenOut: WETH9,
                 fee: 500,
-                recipient: owner,
+                recipient: address(this),
                 deadline: block.timestamp,
                 amountIn: balance,
                 amountOutMinimum: 0,
                 sqrtPriceLimitX96: 0
             });
-
-        // The call to `exactInputSingle` executes the swap.
         amountOut = swapRouter.exactInputSingle(params);
+    }
+    function _transfer(uint256 _profit) internal {
+        _profit = _profit/DECIMALS;
+        address sender = msg.sender;
+        uint256 balance = IERC20(WETH9).balanceOf(address(this));
+        uint256 feeAmount;
+        if (sender != owner){
+            // todo convert profit to weth
+            IERC20(WETH9).transfer(owner, feeAmount);
+        }
+        IERC20(WETH9).transfer(owner, balance-feeAmount); // msg.sender
     }
 
     // owner functions
