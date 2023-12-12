@@ -22,6 +22,7 @@ contract DappTest is Test {
     address constant alice = address(0x11111555);
 
     function setUp() public {
+        vm.createSelectFork({urlOrAlias: "arbitrum_infura_v4", blockNumber: 159350734});
         dapp = new dApp();
         deal(PSM, alice, 2e23);
     }
