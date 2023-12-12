@@ -27,10 +27,14 @@ contract DappTest is Test {
         deal(PSM, address(this), 200_000e18);
     }
     function test_getPrice() public {
-        (uint256 profitARB,) = dapp.checkARB(0);
+        (uint256 profitARB, uint256 totalARB, uint256 worthARB) = dapp.checkARB(100);
         console2.log("ARB: $", profitARB/10**18);
-        (uint256 profitUSDCE,) = dapp.checkUSDCE(0);
-        console2.log("USDCE: $", profitUSDCE/10**18);   
+        console2.log("ARB: $", totalARB/10**18);
+        console2.log("ARB: $", worthARB/10**18);
+        (uint256 profitUSDCE, uint256 totalUSDCE, uint256 worthUSDCE) = dapp.checkUSDCE(90);
+        console2.log("USDCE: $", profitUSDCE/10**18);  
+        console2.log("USDCE: $", totalUSDCE/10**18);
+        console2.log("USDCE: $", worthUSDCE/10**18); 
     }
     function testrevert_owner() public {
         vm.startPrank(alice);
@@ -38,16 +42,23 @@ contract DappTest is Test {
         dapp.changeOwner(alice);
     }
     function test_USDC() public {
+        uint256 balance = address(this).balance;
         vm.startPrank(alice);
         IERC20(PSM).approve(address(dapp), 100_000e18);
-        dapp.convertUSDCE(80,3);
-        console2.log(IERC20(WETH9).balanceOf(address(this)));       
+        dapp.convertUSDCE(80,5);
+        console2.log(IERC20(WETH9).balanceOf(address(this)));   
+        console2.log(address(this).balance-balance);
+        console2.log(address(alice).balance);    
+        console2.log(address(dapp).balance); 
     }
     function test_ARB() public {
+        uint256 balance = address(this).balance;
         vm.startPrank(alice);
         IERC20(PSM).approve(address(dapp), 100_000e18);
-        dapp.convertARB(90, 10);
+        dapp.convertARB(100, 6);
         console2.log(IERC20(WETH9).balanceOf(address(this))); 
+        console2.log(address(this).balance-balance);
+        console2.log(address(alice).balance);   
     }
     // function test_USDC1() public {
     //     vm.startPrank(alice);
@@ -109,4 +120,5 @@ contract DappTest is Test {
     //     console2.log(IERC20(ARB).balanceOf(address(dapp)));
     //     console2.log(IERC20(ARB).balanceOf(address(PORTAL)));
     // }
+    receive() external payable {}
 }

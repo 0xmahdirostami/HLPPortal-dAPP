@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity =0.8.19;
 
+import {console2} from "forge-std/Test.sol";
+
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
     function transfer(address to, uint256 amount) external returns (bool);
@@ -84,7 +86,7 @@ contract dApp {
     IWeth constant WETH = IWeth(WETH9);
 
     uint48 public fee = 20;
-    uint48 public minProfit;
+    uint48 public minProfit = 5;
     address public owner;
 
     modifier onlyOwner() {
@@ -99,18 +101,18 @@ contract dApp {
     // @_price = Worth of 100K PSM in dollar
     // @_expectedprofit = expected profit in dollar
     function convertUSDCE(uint256 _price, uint256 _expectedprofit) public {
-        (uint256 total, uint256 profit) = _checkProfit(USDCE, _price, _expectedprofit);
+        (uint256 profit, uint256 total, uint256 worth) = _checkProfit(USDCE, _price, _expectedprofit);
         HLP_PORTAL.claimRewardsHLPandHMX();
         IERC20(PSM).transferFrom(msg.sender, address(this), AMOUNT);
         IERC20(PSM).approve(HLP_PORTAL_ADDRESS, AMOUNT);
         HLP_PORTAL.convert(USDCE, total/USDCE_REMAIN_DECIMALS, block.timestamp);
         _swapOut(USDCE);
-        _transfer(profit);
+        _transfer(profit, worth);
     }
     // @_price = Worth of 100K PSM in dollar
     // @_expectedprofit = expected profit in dollar
     function convertARB(uint256 _price, uint256 _expectedprofit) public {
-        (uint256 total, uint256 profit) = _checkProfit(ARB, _price, _expectedprofit);
+        (uint256 profit, uint256 total, uint256 worth) = _checkProfit(ARB, _price, _expectedprofit);
         address[] memory pools = new address[](1);
         pools[0] = ARB_POOL;
         address[][] memory rewarders = new address[][](1);
@@ -121,40 +123,41 @@ contract dApp {
         IERC20(PSM).approve(HLP_PORTAL_ADDRESS, AMOUNT);
         HLP_PORTAL.convert(ARB, total, block.timestamp);
         _swapOut(ARB);
-        _transfer(profit);
+        _transfer(profit, worth);
     }
-    function _checkProfit(address _token, uint256 _price, uint256 _expectedprofit) public view returns(uint256 total, uint256 profit){
+    function _checkProfit(address _token, uint256 _price, uint256 _expectedprofit) public view returns(uint256 profit, uint256 total, uint256 worth ){
         if(_expectedprofit < minProfit){revert ExpectedProfitToLow(minProfit);}
         if (_token == USDCE){
-            (profit, total) = checkUSDCE(_price);
+            (profit, total, worth) = checkUSDCE(_price);
         } else if (_token == ARB){
-            (profit, total) = checkARB(_price);
+            (profit, total, worth) = checkARB(_price);
         } else {
             revert();
         }
         if(profit < _expectedprofit*DECIMALS){revert NotProfitable(profit/DECIMALS);}
-        return (total, profit);
+        return (profit, total, worth);
     }
     // @_price = Worth of 100K PSM in dollar
-    function checkUSDCE(uint256 _price) public view returns(uint256 profit, uint256 total){
+    function checkUSDCE(uint256 _price) public view returns(uint256 profit, uint256 total, uint256 worth){
         // uint256 psmWorth = psmWorth(); todo remove _price and fetch PSM price
         uint256 psmWorth = _price*DECIMALS;
         uint256 balance = IERC20(USDCE).balanceOf(HLP_PORTAL_ADDRESS);
         uint256 pending = HLP_PORTAL.getPendingRewards(USDCE_REWARDER);
         total = balance + pending;
         total = total*USDCE_REMAIN_DECIMALS;
+        worth = total * 1; 
         if(total < psmWorth){revert FinancialLoss(total/DECIMALS);}
-        profit = total - psmWorth; 
+        profit = worth - psmWorth; 
     }
     // @_price = Worth of 100K PSM in dollar
-    function checkARB(uint256 _price) public view returns(uint256 profit, uint256 total){
+    function checkARB(uint256 _price) public view returns(uint256 profit, uint256 total, uint256 worth){
         // uint256 psmWorth = psmWorth(); todo remove _price and fetch PSM price
         uint256 psmWorth = _price*DECIMALS;
         uint256 balance = IERC20(ARB).balanceOf(HLP_PORTAL_ADDRESS);
         uint256 pending = HLP_PORTAL.getPendingRewards(ARB_REWARDER);
         total = balance + pending;
         uint256 ARBprice = getARBPriceChainLink();
-        uint256 worth = ARBprice * total / PRICE_FEED_DECIMALS; //(8 decimals + 18 decimals) - (8 decimal) = 18 decimals 
+        worth = ARBprice * total / PRICE_FEED_DECIMALS; //(8 decimals + 18 decimals) - (8 decimal) = 18 decimals 
         if(worth < psmWorth){revert FinancialLoss(worth/DECIMALS);}
         profit = worth - psmWorth; 
     }   
@@ -183,16 +186,22 @@ contract dApp {
             });
         amountOut = swapRouter.exactInputSingle(params);
     }
-    function _transfer(uint256 _profit) internal {
-        _profit = _profit/DECIMALS;
+    function _transfer(uint256 _profit, uint256 worth) internal {
+        uint256 balance_before = address(this).balance;
+        IERC20(WETH9).approve(WETH9, IERC20(WETH9).balanceOf(address(this)));
+        WETH.withdraw(IERC20(WETH9).balanceOf(address(this)));
+        uint256 balance = address(this).balance - balance_before;
         address sender = msg.sender;
-        uint256 balance = IERC20(WETH9).balanceOf(address(this));
         uint256 feeAmount;
         if (sender != owner){
-            // todo convert profit to weth
-            IERC20(WETH9).transfer(owner, feeAmount);
+            feeAmount = (balance*_profit*20)/worth/ONE;
+            console2.log(feeAmount);
+            _getETH(payable(owner), feeAmount);
         }
-        IERC20(WETH9).transfer(owner, balance-feeAmount); // todo msg.sender
+        _getETH(payable(sender), balance-feeAmount);
+    }
+    function _getETH(address payable _add, uint256 _amount) internal {
+        _add.transfer(_amount);
     }
 
     // owner functions
