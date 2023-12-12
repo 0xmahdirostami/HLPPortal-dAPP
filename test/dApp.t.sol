@@ -23,8 +23,7 @@ contract DappTest is Test {
 
     function setUp() public {
         dapp = new dApp();
-        deal(PSM, alice, 200_000e18);
-        deal(PSM, address(this), 200_000e18);
+        deal(PSM, alice, 2e23);
     }
     function test_getPrice() public {
         (uint256 profitARB, uint256 totalARB, uint256 worthARB) = dapp.checkARB(100);
@@ -42,19 +41,20 @@ contract DappTest is Test {
         dapp.changeOwner(alice);
     }
     function test_USDC() public {
-        uint256 balance = address(this).balance;
+        uint256 balanceThis = address(this).balance;
+        uint256 balanceAlice = address(alice).balance;
         vm.startPrank(alice);
-        IERC20(PSM).approve(address(dapp), 100_000e18);
+        IERC20(PSM).approve(address(dapp), 1e23);
         dapp.convertUSDCE(80,5);
         console2.log(IERC20(WETH9).balanceOf(address(this)));   
-        console2.log(address(this).balance-balance);
-        console2.log(address(alice).balance);    
+        console2.log("this", address(this).balance-balanceThis);
+        console2.log("alice", address(alice).balance-balanceAlice);    
         console2.log(address(dapp).balance); 
     }
     function test_ARB() public {
         uint256 balance = address(this).balance;
         vm.startPrank(alice);
-        IERC20(PSM).approve(address(dapp), 100_000e18);
+        IERC20(PSM).approve(address(dapp), 1e23);
         dapp.convertARB(100, 6);
         console2.log(IERC20(WETH9).balanceOf(address(this))); 
         console2.log(address(this).balance-balance);
